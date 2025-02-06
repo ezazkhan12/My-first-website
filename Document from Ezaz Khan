@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inverse of 3x3 Matrix</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { margin: 10px 0; border-collapse: collapse; }
+        td { width: 50px; height: 30px; text-align: center; border: 1px solid black; }
+        input { width: 40px; text-align: center; }
+        button { margin: 10px; padding: 5px 10px; }
+        pre { font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Enter values for Matrix A</h2>
+    <table>
+        <tr>
+            <td><input type="number" id="a00"></td>
+            <td><input type="number" id="a01"></td>
+            <td><input type="number" id="a02"></td>
+        </tr>
+        <tr>
+            <td><input type="number" id="a10"></td>
+            <td><input type="number" id="a11"></td>
+            <td><input type="number" id="a12"></td>
+        </tr>
+        <tr>
+            <td><input type="number" id="a20"></td>
+            <td><input type="number" id="a21"></td>
+            <td><input type="number" id="a22"></td>
+        </tr>
+    </table>
+
+    <button onclick="calculateInverse()">Find Inverse</button>
+
+    <h2>Solution</h2>
+    <p id="error" style="color: red;"></p>
+    <pre id="solution"></pre>
+
+    <script>
+        function calculateInverse() {
+            document.getElementById("error").innerText = "";
+            document.getElementById("solution").innerText = "";
+
+            // Get matrix values from input fields
+            let A = [
+                [parseInt(document.getElementById('a00').value) || 0, parseInt(document.getElementById('a01').value) || 0, parseInt(document.getElementById('a02').value) || 0],
+                [parseInt(document.getElementById('a10').value) || 0, parseInt(document.getElementById('a11').value) || 0, parseInt(document.getElementById('a12').value) || 0],
+                [parseInt(document.getElementById('a20').value) || 0, parseInt(document.getElementById('a21').value) || 0, parseInt(document.getElementById('a22').value) || 0]
+            ];
+
+            // Compute determinant
+            function determinant3x3(m) {
+                return m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+                       m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+                       m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+            }
+
+            let detA = determinant3x3(A);
+            if (detA === 0) {
+                document.getElementById("error").innerText = "Matrix is singular, inverse does not exist.";
+                return;
+            }
+
+            // Compute cofactor matrix
+            function determinant2x2(m) {
+                return (m[0][0] * m[1][1]) - (m[0][1] * m[1][0]);
+            }
+
+            let cofactors = [
+                [
+                    determinant2x2([[A[1][1], A[1][2]], [A[2][1], A[2][2]]]),
+                    -determinant2x2([[A[1][0], A[1][2]], [A[2][0], A[2][2]]]),
+                    determinant2x2([[A[1][0], A[1][1]], [A[2][0], A[2][1]]])
+                ],
+                [
+                    -determinant2x2([[A[0][1], A[0][2]], [A[2][1], A[2][2]]]),
+                    determinant2x2([[A[0][0], A[0][2]], [A[2][0], A[2][2]]]),
+                    -determinant2x2([[A[0][0], A[0][1]], [A[2][0], A[2][1]]])
+                ],
+                [
+                    determinant2x2([[A[0][1], A[0][2]], [A[1][1], A[1][2]]]),
+                    -determinant2x2([[A[0][0], A[0][2]], [A[1][0], A[1][2]]]),
+                    determinant2x2([[A[0][0], A[0][1]], [A[1][0], A[1][1]]])
+                ]
+            ];
+
+            // Compute adjoint (transpose of cofactor matrix)
+            let adjoint = [
+                [cofactors[0][0], cofactors[1][0], cofactors[2][0]],
+                [cofactors[0][1], cofactors[1][1], cofactors[2][1]],
+                [cofactors[0][2], cofactors[1][2], cofactors[2][2]]
+            ];
+
+            // Display solution in the structured format (Det(A) outside Adj(A))
+            let solution = `
+Given Matrix A =
+[ ${A[0][0]}  ${A[0][1]}  ${A[0][2]} ]
+[ ${A[1][0]}  ${A[1][1]}  ${A[1][2]} ]
+[ ${A[2][0]}  ${A[2][1]}  ${A[2][2]} ]
+
+Det(A) = ${detA}
+
+Adj(A) =
+[ ${adjoint[0][0]}  ${adjoint[0][1]}  ${adjoint[0][2]} ]
+[ ${adjoint[1][0]}  ${adjoint[1][1]}  ${adjoint[1][2]} ]
+[ ${adjoint[2][0]}  ${adjoint[2][1]}  ${adjoint[2][2]} ]
+
+A⁻¹ = (1 / ${detA}) × Adj(A)
+
+A⁻¹ =
+(1 / ${detA}) ×
+[ ${adjoint[0][0]}  ${adjoint[0][1]}  ${adjoint[0][2]} ]
+[ ${adjoint[1][0]}  ${adjoint[1][1]}  ${adjoint[1][2]} ]
+[ ${adjoint[2][0]}  ${adjoint[2][1]}  ${adjoint[2][2]} ]
+`;
+            document.getElementById("solution").innerText = solution;
+        }
+    </script>
+    <footer style="margin-top: 20px; text-align: center;">
+    <p>Created by Ezaz Khan</p>
+</footer>
+</body>
+</html>
